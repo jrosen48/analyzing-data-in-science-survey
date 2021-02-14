@@ -1,0 +1,17 @@
+name|type|data|command|depend|seed|path|time|size|bytes|format|iteration|parent|children|seconds|warnings|error
+data_mailing_list|stem|50d34b9d4a506124|4b04c2577b4dee97|e3b5f2e6e7a0ca04|-1723643117|_targets/objects/data_mailing_list|9f07449d147b147b|a1698fb444b51d2d|154562|rds|vector|||1.118|Duplicated column names deduplicated Q97  Q97_1 55|
+data_mailing_list_cleaned_names|stem|cab0be18563be0b7|a1719446a7784fe5|6d45bf17425e942c|-2128670623|_targets/objects/data_mailing_list_cleaned_names|41fdb4a5b24a1cf5|3d75f470f2e059d8|154885|rds|vector|||0.981||
+data_mailing_list_sliced|stem|e4dbd4aef045e35e|3a757dc30a4e97f1|814abff816288c31|1554691682|_targets/objects/data_mailing_list_sliced|7dda5b5b03531321|3f80dfc4ac1271f2|151052|rds|vector|||0.884||
+data_mailing_list_processed|stem|1f354881eeda92a0|6cfb9cf551678150|dbea1e58b90904d0|-1457669906|_targets/objects/data_mailing_list_processed|61af7cefad7d251d|efc692e1fda82743|151180|rds|vector|||0.891||
+data_combined|stem|301b678c82bbba0a|1cc6184cfea70f38|47faa700a53aebac|-1394675923|_targets/objects/data_combined|c80814b00b0f0214|d5f7faea3de4b4c0|154041|rds|vector|||0.005||
+data_social_media|stem|5062916c44e086e2|fabfcc3838c5de9f|e3b5f2e6e7a0ca04|-1115469339|_targets/objects/data_social_media|99c63b66ab5d1229|103f77a56f421b09|8151|rds|vector|||1.095|Duplicated column names deduplicated Q97  Q97_1 55|
+data_social_media_cleaned_names|stem|f81e9839fc0d520c|dcba9d3fbcbfd5cf|d9a163c4fc63a83b|-1424838020|_targets/objects/data_social_media_cleaned_names|30470904133420db|d274b5c005d7026a|8492|rds|vector|||0.086||
+data_social_media_sliced|stem|ef253a34998def85|1269ccc4454ed9fb|f11afb26992323d1|-259393264|_targets/objects/data_social_media_sliced|84c1144a5c5ff20b|ab1169daed17c690|5823|rds|vector|||0.006||
+data_social_media_processed|stem|0445beb659d96c81|07858415d324635c|84963444abc62e6d|-755323580|_targets/objects/data_social_media_processed|72ce7f17db14ca54|75754713cf7b81f0|5840|rds|vector|||0.005||
+progress_density|stem|f7e5d549782b0c88|8510f9b14a8c647e|a80d758b292c6858|-2024736612|_targets/objects/progress_density|24ed8f9b93aa347d|ce215c34575522a4|505651|rds|vector|||0.961||
+data_combined_filtered|stem|63a3eb156a77891d|021586827ebdb303|17aa8a2500bab7f0|2128377014|_targets/objects/data_combined_filtered|c1349fe721681c39|058489fafaab36f1|130736|rds|vector|||0.007||
+data_social_media|stem|5062916c44e086e2|fabfcc3838c5de9f|e3b5f2e6e7a0ca04|-1115469339|_targets/objects/data_social_media|99c63b66ab5d1229|103f77a56f421b09|8151|rds|vector|||1.095|Duplicated column names deduplicated Q97  Q97_1 55|
+data_social_media_cleaned_names|stem|f81e9839fc0d520c|dcba9d3fbcbfd5cf|d9a163c4fc63a83b|-1424838020|_targets/objects/data_social_media_cleaned_names|30470904133420db|d274b5c005d7026a|8492|rds|vector|||0.086||
+data_social_media_sliced|stem|ef253a34998def85|1269ccc4454ed9fb|f11afb26992323d1|-259393264|_targets/objects/data_social_media_sliced|84c1144a5c5ff20b|ab1169daed17c690|5823|rds|vector|||0.006||
+data_social_media_processed|stem|0445beb659d96c81|07858415d324635c|84963444abc62e6d|-755323580|_targets/objects/data_social_media_processed|72ce7f17db14ca54|75754713cf7b81f0|5840|rds|vector|||0.005||
+data_combined_filtered|stem|8bce8bed068f5112|dd2a1f5cbe767b03|17aa8a2500bab7f0|2128377014|_targets/objects/data_combined_filtered|5cf2ab4e73ff9a14|909c2ac50c1f63c3|1126|rds|vector|||0.93||
