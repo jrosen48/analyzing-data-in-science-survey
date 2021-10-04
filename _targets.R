@@ -1,18 +1,4 @@
 library(targets)
-# This is an example _targets.R file. Every
-# {targets} pipeline needs one.
-# Use tar_script() to create _targets.R and tar_edit()
-# to open it again for editing.
-# Then, run tar_make() to run the pipeline
-# and tar_read(summary) to view the results.
-
-# Define custom functions and other global objects.
-# This is where you write source(\"R/functions.R\")
-# if you keep your functions in external scripts.
-
-# summ <- function(dataset) {
-#   summarize(dataset, mean_x = mean(x))
-# }
 
 # Set target-specific options such as packages.
 tar_option_set(packages = c("tidyverse", "here", "janitor"))
@@ -34,6 +20,8 @@ list(
   tar_target(progress_density, data_combined %>% mutate(progress = as.integer(progress)) %>% ggplot(aes(x = progress)) + geom_histogram()),
   
   # may want to change this to ~40-60%
-  tar_target(data_combined_filtered, data_combined %>% mutate(progress = as.integer(progress)) %>% filter(progress > 100))
+  tar_target(for_email_addresses, data_combined %>% mutate(progress = as.integer(progress)) %>% filter(!is.na(email_b))),
+  tar_target(write_email_addresses, for_email_addresses %>% select(end_date, email_b, collection, progress) %>% write_csv("emails-to-message.csv")),
+  tar_target(data_combined_filtered, data_combined %>% mutate(progress = as.integer(progress)) %>% filter(progress >= 40))
   
 )

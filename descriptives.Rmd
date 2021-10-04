@@ -1,0 +1,124 @@
+---
+title: "Untitled"
+author: "Josh"
+date: "9/1/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Josh looks at the qualities of the people in our survey (years teaching, level of preparedness) and see how it affects the type of data they use in their classroom (Q106 or other quantitative questions)
+
+```{r}
+library(tidyverse)
+library(targets)
+
+targets::tar_load(data_combined_filtered)
+
+d <- data_combined_filtered
+```
+
+## Satisfaction
+
+```{r}
+d %>% 
+  mutate(q101_1_rc = case_when(
+    q101_1 == "Strongly disagree" ~ 1,
+    q101_1 == "Somewhat disagree" ~ 2,
+    q101_1 == "Neither agree nor disagree" ~ 3,
+    q101_1 == "Somewhat agree" ~ 4,
+    q101_1 == "Strongly agree" ~ 5
+  )) %>% 
+  select(q101_1_rc) %>% 
+  mutate(q101_1_rc = as.integer(q101_1_rc)) %>% 
+  summarize(mean_var = mean(q101_1_rc, na.rm = TRUE),
+            sd_var = sd(q101_1_rc, na.rm = T)) # 3.34 (1.04)
+
+d %>% 
+  mutate(q101_2_rc = case_when(
+    q101_2 == "Strongly disagree" ~ 1,
+    q101_2 == "Somewhat disagree" ~ 2,
+    q101_2 == "Neither agree nor disagree" ~ 3,
+    q101_2 == "Somewhat agree" ~ 4,
+    q101_2 == "Strongly agree" ~ 5
+  )) %>% 
+  select(q101_2_rc) %>% 
+  mutate(q101_2_rc = as.integer(q101_2_rc)) %>% 
+  summarize(mean_var = mean(q101_2_rc, na.rm = TRUE),
+            sd_var = sd(q101_2_rc, na.rm = T)) # 3.72 (1.03)
+
+d %>% 
+  mutate(q101_3_rc = case_when(
+    q101_3 == "Strongly disagree" ~ 1,
+    q101_3 == "Somewhat disagree" ~ 2,
+    q101_3 == "Neither agree nor disagree" ~ 3,
+    q101_3 == "Somewhat agree" ~ 4,
+    q101_3 == "Strongly agree" ~ 5
+  )) %>% 
+  select(q101_3_rc) %>% 
+  mutate(q101_3_rc = as.integer(q101_3_rc)) %>% 
+  summarize(mean_var = mean(q101_3_rc, na.rm = TRUE),
+            sd_var = sd(q101_3_rc, na.rm = T)) # 4.41 (.75)
+
+d %>% mutate(split_tools = str_split(q78, ",")) %>% 
+  select(split_tools) %>% 
+  unnest(split_tools) %>% 
+  count(split_tools) %>% 
+  arrange(desc(n))
+```
+
+## years
+
+```{r}
+d %>% 
+  select(years_worked) %>% 
+  mutate(years_worked = as.numeric(years_worked)) %>% 
+  count(years_worked) %>% # there are some outliers here
+  knitr::kable()
+
+d %>% 
+  select(years_worked) %>% 
+  mutate(years_worked = as.numeric(years_worked)) %>% 
+  ggplot(aes(x =years_worked)) +
+  geom_histogram() +
+  xlim(0, 50)
+```
+
+Consider contrasting to CC of Data stats on experience of teachers
+
+Look at differences between less and more experienced
+
+```{r}
+# paper
+d %>% 
+  select(response_id, years_worked, q106, ) %>% 
+  mutate(years_worked = as.numeric(years_worked)) %>% 
+  mutate(first_hand_paper = str_detect(q106, "first-hand data using pen")) %>% 
+    mutate(first_hand_digital = str_detect(q106, "first-hand data using digital")) %>% 
+  select(years_worked, first_hand_paper, everything()) %>% 
+  group_by(first_hand_paper) %>% 
+  summarize(mean_years_worked = mean(years_worked, na.rm = T))
+  # separate(q106, into = str_c("var_", 1:4), sep = ",")
+
+## digital
+d %>% 
+  select(response_id, years_worked, q106, ) %>% 
+  mutate(years_worked = as.numeric(years_worked)) %>% 
+  mutate(first_hand_paper = str_detect(q106, "first-hand data using pen")) %>% 
+    mutate(first_hand_digital = str_detect(q106, "first-hand data using digital")) %>% 
+  select(years_worked, first_hand_paper, everything()) %>% 
+  group_by(first_hand_digital) %>% 
+  summarize(mean_years_worked = mean(years_worked, na.rm = T))
+```
+
+## level of preparedness
+
+```{r}
+d %>% 
+  select(response_id, q98) %>% 
+  separate(q98, into = str_c("x", 1:10), sep = ",") %>% 
+  gather(key, val, -response_id) %>% 
+  arrange(response_id)
+```
