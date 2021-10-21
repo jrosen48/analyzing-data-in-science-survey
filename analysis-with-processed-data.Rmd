@@ -1,0 +1,206 @@
+---
+title: "Analysis With Processed Data"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+## Loading, setting up
+
+```{r}
+library(tidyverse)
+
+d <- read_csv("data/fall-2020-analyzing-data-in-science-survey.csv")
+```
+
+## Prepping and exploring grade bands
+
+```{r}
+d %>% 
+  mutate(n_grades = str_count(grade_level_taught, ",")) %>% 
+  count(n_grades)
+
+d_grades <- d %>% 
+  select(response_id, grade_level_taught) %>% 
+  mutate(grade_level_taught = str_replace(grade_level_taught, ":", "")) %>% 
+  separate(col = grade_level_taught, into = c(str_c("grade", letters[1:13])), sep = ",") %>% 
+  gather(key, val, -response_id) %>% 
+  arrange(response_id) %>% 
+  mutate(val = as.integer(val)) %>% 
+  mutate(elem = if_else(val <= 5, 1, 0)) %>% 
+  mutate(second = if_else(val >= 6, 1, 0)) %>% 
+  mutate(middle = if_else(val >= 6 & val <= 8, 1, 0)) %>% 
+  mutate(high = if_else(val >= 9, 1, 0)) %>% 
+  select(response_id, elem, second, middle, high) %>%
+  group_by(response_id) %>% 
+  summarize(elem = if_else(any(elem == 1), 1, 0),
+            second = if_else(any(second == 1), 1, 0),
+            middle = if_else(any(middle == 1), 1, 0),
+            high = if_else(any(high == 1), 1, 0)) %>% 
+  mutate_if(is.double, replace_na, 0)
+
+d_grades %>% 
+  count(elem, middle, high) %>% 
+  knitr::kable()
+
+# 194 only teach high
+# 68 only teach middle
+# 14 only teach elem
+
+# 28 teach middle and high
+# 8 teach elem and middle
+# 10 teach all
+
+# 8 teach none (remove?)
+```
+
+```{r}
+d <- d %>% 
+  left_join(d_grades)
+```
+## reasons for not using a tool
+### overall
+```{r}
+d %>% 
+  select(response_id, elem, middle, high, q97) %>% 
+  mutate(q97 = str_replace(q97, ", ", "; ")) %>%
+  mutate(q97 = str_replace(q97, "etc\\.\\)", "")) %>%
+  separate(col = q97, into = c(str_c("grade", letters[1:9])), sep = ",") %>% 
+  gather(key, val, -response_id, -elem, -middle, -high) %>% 
+  filter(val!=" ") %>% 
+  filter(!is.na(val)) %>% 
+  janitor::tabyl(val) %>% 
+  arrange(desc(n)) %>% 
+  mutate(percent = round(percent, 3)) %>% 
+  knitr::kable()
+```
+### cost - elem
+```{r}
+d %>% 
+  select(response_id, elem, middle, high, q97) %>% 
+  mutate(q97 = str_replace(q97, ", ", "; ")) %>%
+  mutate(q97 = str_replace(q97, "etc\\.\\)", "")) %>%
+  separate(col = q97, into = c(str_c("grade", letters[1:9])), sep = ",") %>% 
+  gather(key, val, -response_id, -elem, -middle, -high) %>% 
+  filter(val!=" ") %>% 
+  filter(!is.na(val)) %>% 
+  filter(elem == 1) %>% # selecting elem
+  janitor::tabyl(val) %>% 
+  arrange(desc(n)) %>% 
+  mutate(percent = round(percent, 3)) %>% 
+  knitr::kable()
+```
+### cost - midd
+```{r}
+d %>% 
+  select(response_id, elem, middle, high, q97) %>% 
+  mutate(q97 = str_replace(q97, ", ", "; ")) %>%
+  mutate(q97 = str_replace(q97, "etc\\.\\)", "")) %>%
+  separate(col = q97, into = c(str_c("grade", letters[1:9])), sep = ",") %>% 
+  gather(key, val, -response_id, -elem, -middle, -high) %>% 
+  filter(val!=" ") %>% 
+  filter(!is.na(val)) %>% 
+  filter(middle == 1) %>% # selecting elem
+  janitor::tabyl(val) %>% 
+  arrange(desc(n)) %>% 
+  mutate(percent = round(percent, 3)) %>% 
+  knitr::kable()
+```
+### cost - high
+```{r}
+d %>% 
+  select(response_id, elem, middle, high, q97) %>% 
+  mutate(q97 = str_replace(q97, ", ", "; ")) %>%
+  mutate(q97 = str_replace(q97, "etc\\.\\)", "")) %>%
+  separate(col = q97, into = c(str_c("grade", letters[1:9])), sep = ",") %>% 
+  gather(key, val, -response_id, -elem, -middle, -high) %>% 
+  filter(val!=" ") %>% 
+  filter(!is.na(val)) %>% 
+  filter(high == 1) %>% # selecting elem
+  janitor::tabyl(val) %>% 
+  arrange(desc(n)) %>% 
+  mutate(percent = round(percent, 3)) %>% 
+  knitr::kable()
+```
+
+## Tools used
+
+### overall
+
+```{r}
+d %>% 
+  select(response_id, elem, middle, high, q78) %>% 
+  mutate(q78 = str_replace(q78, ", ", "; ")) %>%
+  mutate(q78 = str_replace(q78, "etc\\.\\)", "")) %>%
+  separate(col = q78, into = c(str_c("grade", letters[1:12])), sep = ",") %>% 
+  gather(key, val, -response_id, -elem, -middle, -high) %>% 
+  filter(val!=" ") %>% 
+  filter(!is.na(val)) %>% 
+  janitor::tabyl(val) %>% 
+  arrange(desc(n)) %>% 
+  mutate(percent = round(percent, 3)) %>% 
+  knitr::kable()
+```
+
+### tools - elem
+```{r}
+d %>% 
+  select(response_id, elem, middle, high, q78) %>% 
+  mutate(q78 = str_replace(q78, ", ", "; ")) %>%
+  mutate(q78 = str_replace(q78, "etc\\.\\)", "")) %>%
+  separate(col = q78, into = c(str_c("grade", letters[1:9])), sep = ",") %>% 
+  gather(key, val, -response_id, -elem, -middle, -high) %>% 
+  filter(val!=" ") %>% 
+  filter(!is.na(val)) %>% 
+  filter(elem == 1) %>% # selecting elem
+  janitor::tabyl(val) %>% 
+  arrange(desc(n)) %>% 
+  mutate(percent = round(percent, 3)) %>% 
+  knitr::kable()
+```
+### tools - midd
+```{r}
+d %>% 
+  select(response_id, elem, middle, high, q78) %>% 
+  mutate(q78 = str_replace(q78, ", ", "; ")) %>%
+  mutate(q78 = str_replace(q78, "etc\\.\\)", "")) %>%
+  separate(col = q78, into = c(str_c("grade", letters[1:9])), sep = ",") %>% 
+  gather(key, val, -response_id, -elem, -middle, -high) %>% 
+  filter(val!=" ") %>% 
+  filter(!is.na(val)) %>% 
+  filter(middle == 1) %>% # selecting elem
+  janitor::tabyl(val) %>% 
+  arrange(desc(n)) %>% 
+  mutate(percent = round(percent, 3)) %>% 
+  knitr::kable()
+```
+### tools - high
+```{r}
+d %>% 
+  select(response_id, elem, middle, high, q78) %>% 
+  mutate(q78 = str_replace(q78, ", ", "; ")) %>%
+  mutate(q78 = str_replace(q78, "etc\\.\\)", "")) %>%
+  separate(col = q78, into = c(str_c("grade", letters[1:9])), sep = ",") %>% 
+  gather(key, val, -response_id, -elem, -middle, -high) %>% 
+  filter(val!=" ") %>% 
+  filter(!is.na(val)) %>% 
+  filter(high == 1) %>% # selecting elem
+  janitor::tabyl(val) %>% 
+  arrange(desc(n)) %>% 
+  mutate(percent = round(percent, 3)) %>% 
+  knitr::kable()
+```
+
+## next steps
+
+- create plots for the above - overall and by grade level
+- consider hypothesis tests for grade level differences
+- create code to process qual data (should be relatively straightforward, but good to establish this)
+- access code on computer that is presently under review so we can examine grade-level differences in these variables
+  - "Teachers have identified a strong interest in adding more quantitative activities into their classes (M = 4.41 on a 1–5 scale, with 1 indicating strong disagreement, and 5 indicating strong agreement). We also found that teachers had a strong interest in data-related professional development (74.5% of respondents) and were only moderately satisfied with their current use of data analysis tools (M = 3.34 on a 1-5 scale)."
+
