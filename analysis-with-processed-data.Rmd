@@ -14,8 +14,19 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 
 ```{r}
 library(tidyverse)
+library(googlesheets4)
 
-d <- read_csv("data/fall-2020-analyzing-data-in-science-survey.csv")
+# d <- read_csv("data/fall-2020-analyzing-data-in-science-survey.csv")
+
+meta <- as_sheets_id("https://docs.google.com/spreadsheets/d/1gLyAAp6N_5g-Uo-eb61O-eW2apMzzqNdM8fLcBV7V3g/edit#gid=957320146")
+
+meta
+
+d <- read_sheet("https://docs.google.com/spreadsheets/d/1gLyAAp6N_5g-Uo-eb61O-eW2apMzzqNdM8fLcBV7V3g/edit#gid=957320146")
+
+qual_q80 <- read_sheet("https://docs.google.com/spreadsheets/d/1gLyAAp6N_5g-Uo-eb61O-eW2apMzzqNdM8fLcBV7V3g/edit#gid=957320146", sheet = 8) %>% janitor::clean_names()
+
+qual_q82 <- read_sheet("https://docs.google.com/spreadsheets/d/1gLyAAp6N_5g-Uo-eb61O-eW2apMzzqNdM8fLcBV7V3g/edit#gid=957320146", sheet = 15) %>% janitor::clean_names()
 ```
 
 ## Prepping and exploring grade bands
@@ -63,9 +74,14 @@ d_grades %>%
 d <- d %>% 
   left_join(d_grades)
 ```
+
 ## reasons for not using a tool
 ### overall
+
 ```{r}
+d$q97 %>% is.na() %>% table()
+table(d$q97 == "NA")
+
 overall_q97 <- d %>% 
   select(response_id, elem, middle, high, q97) %>% 
   mutate(q97 = str_replace(q97, ", ", "; ")) %>%
@@ -74,16 +90,18 @@ overall_q97 <- d %>%
   gather(key, val, -response_id, -elem, -middle, -high) %>% 
   filter(val!=" ") %>% 
   filter(!is.na(val)) %>% 
-  janitor::tabyl(val) %>% 
+  count(val) %>% 
+  mutate(percent = n / 329) %>% 
   arrange(desc(n)) %>% 
   mutate(percent = round(percent, 3))
-
-# p %>% 
-#   ggplot(aes(x = reorder(val, percent), y = percent)) +
-#   geom_col() +
-#   coord_flip() +
-#   xlab(NULL)
+  
+  # p %>% 
+  #   ggplot(aes(x = reorder(val, percent), y = percent)) +
+  #   geom_col() +
+  #   coord_flip() +
+  #   xlab(NULL)
 ```
+
 ### cost - elem
 ```{r}
 elem <- d %>% 
@@ -95,10 +113,10 @@ elem <- d %>%
   filter(val!=" ") %>% 
   filter(!is.na(val)) %>% 
   filter(elem == 1) %>% # selecting elem
-  janitor::tabyl(val) %>% 
+  count(val) %>% 
+  mutate(percent = n / 329) %>% 
   arrange(desc(n)) %>% 
   mutate(percent = round(percent, 3)) %>% 
-  mutate(rank_order = dplyr::row_number()) %>% 
   select(val, elem = percent)
 ```
 ### cost - midd
@@ -112,10 +130,10 @@ midd <- d %>%
   filter(val!=" ") %>% 
   filter(!is.na(val)) %>% 
   filter(middle == 1) %>% # selecting elem
-  janitor::tabyl(val) %>% 
+  count(val) %>% 
+  mutate(percent = n / 329) %>% 
   arrange(desc(n)) %>% 
   mutate(percent = round(percent, 3)) %>% 
-  mutate(rank_order = dplyr::row_number()) %>% 
   select(val, midd = percent)
 ```
 ### cost - high
@@ -129,10 +147,10 @@ high <- d %>%
   filter(val!=" ") %>% 
   filter(!is.na(val)) %>% 
   filter(high == 1) %>% # selecting elem
-  janitor::tabyl(val) %>% 
+  count(val) %>% 
+  mutate(percent = n / 329) %>% 
   arrange(desc(n)) %>% 
   mutate(percent = round(percent, 3)) %>% 
-  mutate(rank_order = dplyr::row_number()) %>% 
   select(val, high = percent)
 ```
 ### final table
@@ -154,6 +172,9 @@ to_plot %>%
 ### overall
 
 ```{r}
+table(is.na(d$q78))
+table(d$q78 == "NA")
+
 overall_q78 <- d %>% 
   select(response_id, elem, middle, high, q78) %>% 
   mutate(q78 = str_replace(q78, ", ", "; ")) %>%
@@ -162,7 +183,8 @@ overall_q78 <- d %>%
   gather(key, val, -response_id, -elem, -middle, -high) %>% 
   filter(val!=" ") %>% 
   filter(!is.na(val)) %>% 
-  janitor::tabyl(val) %>% 
+  count(val) %>% 
+  mutate(percent = n / 329) %>% 
   arrange(desc(n)) %>% 
   mutate(percent = round(percent, 3))
 ```
@@ -178,10 +200,10 @@ elem <- d %>%
   filter(val!=" ") %>% 
   filter(!is.na(val)) %>% 
   filter(elem == 1) %>% # selecting elem
-  janitor::tabyl(val) %>% 
+  count(val) %>% 
+  mutate(percent = n / 329) %>% 
   arrange(desc(n)) %>% 
   mutate(percent = round(percent, 3)) %>% 
-  mutate(rank_order = dplyr::row_number()) %>% 
   select(val, elem = percent)
 ```
 ### tools - midd
@@ -195,10 +217,10 @@ midd <- d %>%
   filter(val!=" ") %>% 
   filter(!is.na(val)) %>% 
   filter(middle == 1) %>% # selecting elem
-  janitor::tabyl(val) %>% 
+  count(val) %>% 
+  mutate(percent = n / 329) %>% 
   arrange(desc(n)) %>% 
   mutate(percent = round(percent, 3)) %>% 
-  mutate(rank_order = dplyr::row_number()) %>% 
   select(val, midd = percent)
 ```
 ### tools - high
@@ -212,10 +234,10 @@ high <- d %>%
   filter(val!=" ") %>% 
   filter(!is.na(val)) %>% 
   filter(high == 1) %>% # selecting elem
-  janitor::tabyl(val) %>% 
+  count(val) %>% 
+  mutate(percent = n / 329) %>%
   arrange(desc(n)) %>% 
   mutate(percent = round(percent, 3)) %>% 
-  mutate(rank_order = dplyr::row_number()) %>% 
   select(val, high = percent)
 ```
 
@@ -234,8 +256,211 @@ to_plot %>%
   knitr::kable()
 ```
 
+## qual analyses
+
+### q80
+
+```{r}
+d %>% filter(q80 != "NA")
+
+# overall
+qual_q80 %>% 
+  select(3:9) %>% 
+  summarize_all(sum, na.rm = T) %>% 
+  gather(key, val) %>% 
+  mutate(prop = val/328) %>% 
+  arrange(desc(val)) %>% 
+  knitr::kable()
+
+qual_q80 %>% 
+  left_join(d_grades) %>%
+  select(3:9, elem, middle, high) %>%
+  filter(elem == 1) %>% 
+  summarize_at(vars(1:7), sum, na.rm = T) %>% 
+  gather(key, val) %>% 
+  mutate(prop = val/328) %>% 
+  arrange(desc(val)) %>% 
+  knitr::kable()
+
+qual_q80 %>% 
+  left_join(d_grades) %>%
+  select(3:9, elem, middle, high) %>%
+  filter(middle == 1) %>% 
+  summarize_at(vars(1:7), sum, na.rm = T) %>% 
+  gather(key, val) %>% 
+  mutate(prop = val/328) %>% 
+  arrange(desc(val)) %>% 
+  knitr::kable()
+
+qual_q80 %>% 
+  left_join(d_grades) %>%
+  select(3:9, elem, middle, high) %>%
+  filter(high == 1) %>% 
+  summarize_at(vars(1:7), sum, na.rm = T) %>% 
+  gather(key, val) %>% 
+  mutate(prop = val/328) %>% 
+  arrange(desc(val)) %>% 
+  knitr::kable()
+```
+
+```{r}
+d %>% filter(q82 != "NA")
+
+qual_q82 %>% 
+  select(3:10) %>% 
+  summarize_all(sum, na.rm = T) %>% 
+  gather(key, val) %>% 
+  mutate(prop = val/327) %>% 
+  arrange(desc(val)) %>% 
+  knitr::kable()
+
+qual_q82 %>% 
+  left_join(d_grades) %>%
+  select(3:10, elem, middle, high) %>%
+  filter(elem == 1) %>% 
+  summarize_at(vars(1:8), sum, na.rm = T) %>% 
+  gather(key, val) %>% 
+  mutate(prop = val/327) %>% 
+  arrange(desc(val)) %>% 
+  knitr::kable()
+
+qual_q82 %>% 
+  left_join(d_grades) %>%
+  select(3:10, elem, middle, high) %>%
+  filter(middle == 1) %>% 
+  summarize_at(vars(1:8), sum, na.rm = T) %>% 
+  gather(key, val) %>% 
+  mutate(prop = val/327) %>% 
+  arrange(desc(val)) %>% 
+  knitr::kable()
+
+qual_q82 %>% 
+  left_join(d_grades) %>%
+  select(3:10, elem, middle, high) %>%
+  filter(high == 1) %>% 
+  summarize_at(vars(1:8), sum, na.rm = T) %>% 
+  gather(key, val) %>% 
+  mutate(prop = val/327) %>% 
+  arrange(desc(val)) %>% 
+  knitr::kable()
+```
+
+## Satisfaction
+
+```{r}
+# I am satisfied with the current data analysis tools that I use in my class. 
+d %>% 
+  mutate(q101_1_rc = case_when(
+    q101_1 == "Strongly disagree" ~ 1,
+    q101_1 == "Somewhat disagree" ~ 2,
+    q101_1 == "Neither agree nor disagree" ~ 3,
+    q101_1 == "Somewhat agree" ~ 4,
+    q101_1 == "Strongly agree" ~ 5
+  )) %>% 
+  select(q101_1_rc) %>% 
+  mutate(q101_1_rc = as.integer(q101_1_rc)) %>% 
+  summarize(mean_var = mean(q101_1_rc, na.rm = TRUE),
+            sd_var = sd(q101_1_rc, na.rm = T)) # 3.34 (1.04)
+
+d %>% 
+  mutate(q101_1_rc = case_when(
+    q101_1 == "Strongly disagree" ~ 1,
+    q101_1 == "Somewhat disagree" ~ 2,
+    q101_1 == "Neither agree nor disagree" ~ 3,
+    q101_1 == "Somewhat agree" ~ 4,
+    q101_1 == "Strongly agree" ~ 5
+  )) %>% 
+  select(q101_1_rc, elem, middle, high) %>% 
+  mutate(q101_1_rc = as.integer(q101_1_rc)) %>% 
+  gather(key, val, -q101_1_rc) %>% 
+  filter(val == 1) %>% 
+  group_by(key) %>% 
+  summarize(mean_var = mean(q101_1_rc, na.rm = TRUE),
+            sd_var = sd(q101_1_rc, na.rm = T)) %>% 
+  arrange(desc(mean_var))
+
+# I use quantitative activities with my students regularly.
+d %>% 
+  mutate(q101_2_rc = case_when(
+    q101_2 == "Strongly disagree" ~ 1,
+    q101_2 == "Somewhat disagree" ~ 2,
+    q101_2 == "Neither agree nor disagree" ~ 3,
+    q101_2 == "Somewhat agree" ~ 4,
+    q101_2 == "Strongly agree" ~ 5
+  )) %>% 
+  select(q101_2_rc) %>% 
+  mutate(q101_2_rc = as.integer(q101_2_rc)) %>% 
+  summarize(mean_var = mean(q101_2_rc, na.rm = TRUE),
+            sd_var = sd(q101_2_rc, na.rm = T)) # 3.72 (1.03)
+
+d %>% 
+  mutate(q101_2_rc = case_when(
+    q101_2 == "Strongly disagree" ~ 1,
+    q101_2 == "Somewhat disagree" ~ 2,
+    q101_2 == "Neither agree nor disagree" ~ 3,
+    q101_2 == "Somewhat agree" ~ 4,
+    q101_2 == "Strongly agree" ~ 5
+  )) %>% 
+  select(q101_2_rc, elem, middle, high) %>% 
+  mutate(q101_2_rc = as.integer(q101_2_rc)) %>% 
+  gather(key, val, -q101_2_rc) %>% 
+  filter(val == 1) %>% 
+  group_by(key) %>% 
+  summarize(mean_var = mean(q101_2_rc, na.rm = TRUE),
+            sd_var = sd(q101_2_rc, na.rm = T))%>% 
+  arrange(desc(mean_var))
+
+# I am interested in adding more quantitative activities into my class(es
+d %>% 
+  mutate(q101_3_rc = case_when(
+    q101_3 == "Strongly disagree" ~ 1,
+    q101_3 == "Somewhat disagree" ~ 2,
+    q101_3 == "Neither agree nor disagree" ~ 3,
+    q101_3 == "Somewhat agree" ~ 4,
+    q101_3 == "Strongly agree" ~ 5
+  )) %>% 
+  select(q101_3_rc) %>% 
+  mutate(q101_3_rc = as.integer(q101_3_rc)) %>% 
+  summarize(mean_var = mean(q101_3_rc, na.rm = TRUE),
+            sd_var = sd(q101_3_rc, na.rm = T)) # 4.41 (.75)
+
+d %>% 
+  mutate(q101_3_rc = case_when(
+    q101_3 == "Strongly disagree" ~ 1,
+    q101_3 == "Somewhat disagree" ~ 2,
+    q101_3 == "Neither agree nor disagree" ~ 3,
+    q101_3 == "Somewhat agree" ~ 4,
+    q101_3 == "Strongly agree" ~ 5
+  )) %>% 
+  select(q101_3_rc, elem, middle, high) %>% 
+  mutate(q101_3_rc = as.integer(q101_3_rc)) %>% 
+  gather(key, val, -q101_3_rc) %>% 
+  filter(val == 1) %>% 
+  group_by(key) %>% 
+  summarize(mean_var = mean(q101_3_rc, na.rm = TRUE),
+            sd_var = sd(q101_3_rc, na.rm = T))%>% 
+  arrange(desc(mean_var))
+```
+## PD
+
+```{r}
+d %>% 
+  select(q99) %>% 
+  janitor::tabyl(q99)
+
+d %>% 
+  filter(elem == 1) %>% 
+  janitor::tabyl(q99)
+
+d %>% 
+  filter(middle == 1) %>% 
+  janitor::tabyl(q99)
+
+d %>% 
+  filter(high == 1) %>% 
+  janitor::tabyl(q99)
+```
+
 ## next steps
 
-- create code to process qual data (should be relatively straightforward, but good to establish this)
-- access code on computer that is presently being repaired so we can examine grade-level differences in these variables
-- qual coding features desired in tech tools
+Need to change the n's to be the n teachers per group - tools used and barriers
