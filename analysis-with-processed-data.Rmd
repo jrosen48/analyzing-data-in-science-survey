@@ -114,7 +114,7 @@ elem <- d %>%
   filter(!is.na(val)) %>% 
   filter(elem == 1) %>% # selecting elem
   count(val) %>% 
-  mutate(percent = n / 329) %>% 
+  mutate(percent = n / 32) %>% 
   arrange(desc(n)) %>% 
   mutate(percent = round(percent, 3)) %>% 
   select(val, elem = percent)
@@ -131,7 +131,7 @@ midd <- d %>%
   filter(!is.na(val)) %>% 
   filter(middle == 1) %>% # selecting elem
   count(val) %>% 
-  mutate(percent = n / 329) %>% 
+  mutate(percent = n /114) %>% 
   arrange(desc(n)) %>% 
   mutate(percent = round(percent, 3)) %>% 
   select(val, midd = percent)
@@ -148,7 +148,7 @@ high <- d %>%
   filter(!is.na(val)) %>% 
   filter(high == 1) %>% # selecting elem
   count(val) %>% 
-  mutate(percent = n / 329) %>% 
+  mutate(percent = n / 232) %>% 
   arrange(desc(n)) %>% 
   mutate(percent = round(percent, 3)) %>% 
   select(val, high = percent)
@@ -201,7 +201,7 @@ elem <- d %>%
   filter(!is.na(val)) %>% 
   filter(elem == 1) %>% # selecting elem
   count(val) %>% 
-  mutate(percent = n / 329) %>% 
+  mutate(percent = n / 32) %>% 
   arrange(desc(n)) %>% 
   mutate(percent = round(percent, 3)) %>% 
   select(val, elem = percent)
@@ -218,7 +218,7 @@ midd <- d %>%
   filter(!is.na(val)) %>% 
   filter(middle == 1) %>% # selecting elem
   count(val) %>% 
-  mutate(percent = n / 329) %>% 
+  mutate(percent = n / 114) %>% 
   arrange(desc(n)) %>% 
   mutate(percent = round(percent, 3)) %>% 
   select(val, midd = percent)
@@ -235,7 +235,7 @@ high <- d %>%
   filter(!is.na(val)) %>% 
   filter(high == 1) %>% # selecting elem
   count(val) %>% 
-  mutate(percent = n / 329) %>%
+  mutate(percent = n / 232) %>%
   arrange(desc(n)) %>% 
   mutate(percent = round(percent, 3)) %>% 
   select(val, high = percent)
@@ -461,6 +461,230 @@ d %>%
   janitor::tabyl(q99)
 ```
 
-## next steps
+## first and second hand
 
-Need to change the n's to be the n teachers per group - tools used and barriers
+```{r}
+d %>% 
+  select(response_id, q106) %>% 
+  separate(col = q106, into = c(str_c("response_", letters[1:4])), sep = ",") %>% 
+  gather(key, val, -response_id) %>% 
+  arrange(response_id) %>% 
+  count(val) %>% 
+  mutate(prop = n / 330) %>% 
+  filter(!is.na(n)) %>% 
+  filter(val != "NA") %>% 
+  arrange(desc(n))
+
+d %>% 
+  select(response_id, elem, middle, high, q106) %>% 
+  separate(col = q106, into = c(str_c("response_", letters[1:4])), sep = ",") %>% 
+  gather(key, val, -response_id, -elem, -middle, -high) %>% 
+  arrange(response_id) %>% 
+  filter(elem == 1) %>% 
+  count(val) %>% 
+  mutate(prop = n / 32) %>% # n elem 
+  filter(!is.na(n)) %>% 
+  filter(val != "NA") %>% 
+  arrange(desc(n))
+
+# 114, 232
+d %>% 
+  select(response_id, elem, middle, high, q106) %>% 
+  separate(col = q106, into = c(str_c("response_", letters[1:4])), sep = ",") %>% 
+  gather(key, val, -response_id, -elem, -middle, -high) %>% 
+  arrange(response_id) %>% 
+  filter(middle == 1) %>% 
+  count(val) %>% 
+  mutate(prop = n / 114) %>% # n elem 
+  filter(!is.na(n)) %>% 
+  filter(val != "NA") %>% 
+  arrange(desc(n))
+
+d %>% 
+  select(response_id, elem, middle, high, q106) %>% 
+  separate(col = q106, into = c(str_c("response_", letters[1:4])), sep = ",") %>% 
+  gather(key, val, -response_id, -elem, -middle, -high) %>% 
+  arrange(response_id) %>% 
+  filter(high == 1) %>% 
+  count(val) %>% 
+  mutate(prop = n / 232) %>% # n elem 
+  filter(!is.na(n)) %>% 
+  filter(val != "NA") %>% 
+  arrange(desc(n))
+```
+
+## demographics
+
+```{r}
+d %>% 
+  count(gender) %>% 
+  mutate(prop = n /330) # other is prefer not to say
+
+d %>% 
+  mutate(years_worked = unlist(years_worked)) %>% 
+  mutate(years_worked = as.numeric(years_worked)) %>% 
+  select(years_worked, elem, middle, high) %>% 
+  filter(years_worked < 100) %>% # 2 outliers here
+  summarize(mean_years_worked = mean(years_worked, na.rm = T),
+            sd_years_worked = sd(years_worked, na.rm = T))
+
+d %>% 
+  count(underrepresented) %>% 
+  mutate(prop = n / 330)
+
+d %>% 
+  count(with_which_groups) %>% 
+  arrange(desc(n)) %>% 
+  filter(with_which_groups != "NA") %>% 
+  knitr::kable() # 9 African American/black (2.7%), 4 hispanic (1.2%), 2 asian (0.60%), 2 american indian, 1 muslim (0.30%)
+
+```
+
+## # Organize and/or represent data using tables, charts, or graphs in order to facilitate analysis (4) - 1st - 34, 49, 58
+
+```{r}
+# Science Classes in Which Teachers Report Students Engaging in Various Aspects of Science Practices at Least Once a Week, by Grade Range
+
+d %>% 
+  filter(elem == 1) %>% 
+  count(q98_3) %>% 
+  filter(str_detect(q98_3, "Often") | str_detect(q98_3, "All")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 32) # 34
+
+d %>% 
+  filter(middle == 1) %>% 
+  count(q98_3) %>% 
+  filter(str_detect(q98_3, "Often") | str_detect(q98_3, "All")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 114) # 49
+
+d %>% 
+  filter(high == 1) %>% 
+  count(q98_3) %>% 
+  filter(str_detect(q98_3, "Often") | str_detect(q98_3, "All")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 232) # 58
+
+# never
+
+d %>% 
+  filter(elem == 1) %>% 
+  count(q98_3) %>% 
+  filter(str_detect(q98_3, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 32) # 6
+
+d %>% 
+  filter(middle == 1) %>% 
+  count(q98_3) %>% 
+  filter(str_detect(q98_3, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 114) # 1
+
+d %>% 
+  filter(high == 1) %>% 
+  count(q98_3) %>% 
+  filter(str_detect(q98_3, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 232) # 1
+```
+
+### Analyze data using grade-appropriate methods in order to identify patterns, trends, or relationships (6) - 4th
+
+```{r}
+
+# at least once a week
+d %>%
+  filter(elem == 1) %>%
+  count(q98_5) %>%
+  filter(str_detect(q98_5, "Often") | str_detect(q98_5, "All")) %>%
+  summarize(n = sum(n)) %>%
+  mutate(prop = n / 32) # 27
+
+d %>%
+  filter(middle == 1) %>%
+  count(q98_5) %>%
+  filter(str_detect(q98_5, "Often") | str_detect(q98_5, "All")) %>%
+  summarize(n = sum(n)) %>%
+  mutate(prop = n / 114) # 43
+
+d %>%
+  filter(high == 1) %>%
+  count(q98_5) %>%
+  filter(str_detect(q98_5, "Often") | str_detect(q98_5, "All")) %>%
+  summarize(n = sum(n)) %>%
+  mutate(prop = n / 232) # 47
+
+# never
+
+d %>% 
+  filter(elem == 1) %>% 
+  count(q98_5) %>% 
+  filter(str_detect(q98_5, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 32) # 12
+
+d %>% 
+  filter(middle == 1) %>% 
+  count(q98_5) %>% 
+  filter(str_detect(q98_5, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 114) # 3
+
+d %>% 
+  filter(high == 1) %>% 
+  count(q98_5) %>% 
+  filter(str_detect(q98_5, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 232) # 3
+```
+
+### Determine which data would need to be collected in order to answer a scientific question (regardless of who generated the question) (1) - 5th
+
+```{r}
+# at least once a week
+d %>%
+  filter(elem == 1) %>%
+  count(q98_1) %>%
+  filter(str_detect(q98_1, "Often") | str_detect(q98_1, "All")) %>%
+  summarize(n = sum(n)) %>%
+  mutate(prop = n / 32) # 29
+
+d %>%
+  filter(middle == 1) %>%
+  count(q98_1) %>%
+  filter(str_detect(q98_1, "Often") | str_detect(q98_1, "All")) %>%
+  summarize(n = sum(n)) %>%
+  mutate(prop = n / 114) # 39
+
+d %>%
+  filter(high == 1) %>%
+  count(q98_1) %>%
+  filter(str_detect(q98_1, "Often") | str_detect(q98_1, "All")) %>%
+  summarize(n = sum(n)) %>%
+  mutate(prop = n / 232) # 39
+
+# never
+
+d %>% 
+  filter(elem == 1) %>% 
+  count(q98_1) %>% 
+  filter(str_detect(q98_1, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 32) # 8
+
+d %>% 
+  filter(middle == 1) %>% 
+  count(q98_1) %>% 
+  filter(str_detect(q98_1, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 114) # 2
+
+d %>% 
+  filter(high == 1) %>% 
+  count(q98_1) %>% 
+  filter(str_detect(q98_1, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 232) # 3
+```
