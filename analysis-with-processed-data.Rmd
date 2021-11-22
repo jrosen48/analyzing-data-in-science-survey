@@ -76,6 +76,7 @@ d <- d %>%
 ```
 
 ## reasons for not using a tool
+
 ### overall
 
 ```{r}
@@ -91,18 +92,19 @@ overall_q97 <- d %>%
   filter(val!=" ") %>% 
   filter(!is.na(val)) %>% 
   count(val) %>% 
-  mutate(percent = n / 329) %>% 
+  mutate(percent = n / 330) %>% 
   arrange(desc(n)) %>% 
   mutate(percent = round(percent, 3))
-  
-  # p %>% 
-  #   ggplot(aes(x = reorder(val, percent), y = percent)) +
-  #   geom_col() +
-  #   coord_flip() +
-  #   xlab(NULL)
+
+# p %>% 
+#   ggplot(aes(x = reorder(val, percent), y = percent)) +
+#   geom_col() +
+#   coord_flip() +
+#   xlab(NULL)
 ```
 
 ### cost - elem
+
 ```{r}
 elem <- d %>% 
   select(response_id, elem, middle, high, q97) %>% 
@@ -119,7 +121,9 @@ elem <- d %>%
   mutate(percent = round(percent, 3)) %>% 
   select(val, elem = percent)
 ```
+
 ### cost - midd
+
 ```{r}
 midd <- d %>% 
   select(response_id, elem, middle, high, q97) %>% 
@@ -136,7 +140,9 @@ midd <- d %>%
   mutate(percent = round(percent, 3)) %>% 
   select(val, midd = percent)
 ```
+
 ### cost - high
+
 ```{r}
 high <- d %>% 
   select(response_id, elem, middle, high, q97) %>% 
@@ -153,7 +159,9 @@ high <- d %>%
   mutate(percent = round(percent, 3)) %>% 
   select(val, high = percent)
 ```
+
 ### final table
+
 ```{r}
 to_plot <- overall_q97 %>% 
   left_join(elem) %>% 
@@ -184,12 +192,13 @@ overall_q78 <- d %>%
   filter(val!=" ") %>% 
   filter(!is.na(val)) %>% 
   count(val) %>% 
-  mutate(percent = n / 329) %>% 
+  mutate(percent = n / 330) %>% 
   arrange(desc(n)) %>% 
   mutate(percent = round(percent, 3))
 ```
 
 ### tools - elem
+
 ```{r}
 elem <- d %>% 
   select(response_id, elem, middle, high, q78) %>% 
@@ -206,7 +215,9 @@ elem <- d %>%
   mutate(percent = round(percent, 3)) %>% 
   select(val, elem = percent)
 ```
+
 ### tools - midd
+
 ```{r}
 midd <- d %>% 
   select(response_id, elem, middle, high, q78) %>% 
@@ -223,7 +234,9 @@ midd <- d %>%
   mutate(percent = round(percent, 3)) %>% 
   select(val, midd = percent)
 ```
+
 ### tools - high
+
 ```{r}
 high <- d %>% 
   select(response_id, elem, middle, high, q78) %>% 
@@ -256,9 +269,7 @@ to_plot %>%
   knitr::kable()
 ```
 
-## qual analyses
-
-### q80
+## qual - q80
 
 ```{r}
 d %>% filter(q80 != "NA")
@@ -303,6 +314,8 @@ qual_q80 %>%
   knitr::kable()
 ```
 
+## qual - q82
+
 ```{r}
 d %>% filter(q82 != "NA")
 
@@ -310,7 +323,7 @@ qual_q82 %>%
   select(3:10) %>% 
   summarize_all(sum, na.rm = T) %>% 
   gather(key, val) %>% 
-  mutate(prop = val/327) %>% 
+  mutate(prop = val/330) %>% 
   arrange(desc(val)) %>% 
   knitr::kable()
 
@@ -320,7 +333,7 @@ qual_q82 %>%
   filter(elem == 1) %>% 
   summarize_at(vars(1:8), sum, na.rm = T) %>% 
   gather(key, val) %>% 
-  mutate(prop = val/327) %>% 
+  mutate(prop = val/32) %>% 
   arrange(desc(val)) %>% 
   knitr::kable()
 
@@ -330,7 +343,7 @@ qual_q82 %>%
   filter(middle == 1) %>% 
   summarize_at(vars(1:8), sum, na.rm = T) %>% 
   gather(key, val) %>% 
-  mutate(prop = val/327) %>% 
+  mutate(prop = val/114) %>% 
   arrange(desc(val)) %>% 
   knitr::kable()
 
@@ -340,9 +353,35 @@ qual_q82 %>%
   filter(high == 1) %>% 
   summarize_at(vars(1:8), sum, na.rm = T) %>% 
   gather(key, val) %>% 
-  mutate(prop = val/327) %>% 
+  mutate(prop = val/234) %>% 
   arrange(desc(val)) %>% 
   knitr::kable()
+```
+
+### qual 82 - size
+
+```{r}
+qual_data_size <- qual_q82 %>% 
+  left_join(d_grades) %>%
+  select(3:11, elem, middle, high) %>% 
+  rename(size = data_size_level_2_s_10_rows_2_columns_m_20_rows_3_4_columns_l_100s_of_rows_xl_thousands_of_rows)
+
+qual_data_size %>% 
+  filter(!is.na(size)) %>% 
+  filter(size != "")
+
+qual_data_size %>% 
+  mutate(size = str_replace_all(size, "-", ",")) %>% 
+  mutate(size = str_replace_all(size, "<", ",")) %>% 
+  mutate(size = str_replace_all(size, " ", "")) %>% 
+  mutate(size = ifelse(size == "small", "s", size)) %>% 
+  mutate(size = tolower(size)) %>% 
+  mutate(size = str_split(size, ",")) %>% 
+  unnest(size) %>% 
+  filter(!is.na(size)) %>% 
+  filter(size != "") %>%
+  count(size) %>% 
+  mutate(prop = n / 96)
 ```
 
 ## Satisfaction
@@ -441,6 +480,7 @@ d %>%
             sd_var = sd(q101_3_rc, na.rm = T))%>% 
   arrange(desc(mean_var))
 ```
+
 ## PD
 
 ```{r}
@@ -540,7 +580,9 @@ d %>%
 
 ```
 
-## # Organize and/or represent data using tables, charts, or graphs in order to facilitate analysis (4) - 1st - 34, 49, 58
+## NSSME questions
+
+### Organize and/or represent data using tables, charts, or graphs in order to facilitate analysis (4) - 1st - 34, 49, 58
 
 ```{r}
 # Science Classes in Which Teachers Report Students Engaging in Various Aspects of Science Practices at Least Once a Week, by Grade Range
@@ -590,7 +632,7 @@ d %>%
   mutate(prop = n / 232) # 1
 ```
 
-### Analyze data using grade-appropriate methods in order to identify patterns, trends, or relationships (6) - 4th
+### Analyze data using grade-appropriate methods in order to identify patterns, trends, or relationships (6) - 5th
 
 ```{r}
 
@@ -687,4 +729,306 @@ d %>%
   filter(str_detect(q98_1, "Never")) %>% 
   summarize(n = sum(n)) %>% 
   mutate(prop = n / 232) # 3
+```
+
+### Identify potential sources of variability (e.g., measurement error, natural variation) in the data (5) - NA
+
+```{r}
+# at least once a week
+d %>%
+  filter(elem == 1) %>%
+  count(q98_4) %>%
+  filter(str_detect(q98_4, "Often") | str_detect(q98_4, "All")) %>%
+  summarize(n = sum(n)) %>%
+  mutate(prop = n / 32)
+
+d %>%
+  filter(middle == 1) %>%
+  count(q98_4) %>%
+  filter(str_detect(q98_4, "Often") | str_detect(q98_4, "All")) %>%
+  summarize(n = sum(n)) %>%
+  mutate(prop = n / 114)
+
+d %>%
+  filter(high == 1) %>%
+  count(q98_4) %>%
+  filter(str_detect(q98_4, "Often") | str_detect(q98_4, "All")) %>%
+  summarize(n = sum(n)) %>%
+  mutate(prop = n / 232)
+
+# never
+
+d %>% 
+  filter(elem == 1) %>% 
+  count(q98_4) %>% 
+  filter(str_detect(q98_4, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 32)
+
+d %>% 
+  filter(middle == 1) %>% 
+  count(q98_4) %>% 
+  filter(str_detect(q98_4, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 114)
+
+d %>% 
+  filter(high == 1) %>% 
+  count(q98_4) %>% 
+  filter(str_detect(q98_4, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 232)
+```
+
+### Consider how missing data or measurement error can affect data interpretation (7) 
+
+```{r}
+# at least once a week
+d %>%
+  filter(elem == 1) %>%
+  count(q98_6) %>%
+  filter(str_detect(q98_6, "Often") | str_detect(q98_6, "All")) %>%
+  summarize(n = sum(n)) %>%
+  mutate(prop = n / 32)
+
+d %>%
+  filter(middle == 1) %>%
+  count(q98_6) %>%
+  filter(str_detect(q98_6, "Often") | str_detect(q98_6, "All")) %>%
+  summarize(n = sum(n)) %>%
+  mutate(prop = n / 114)
+
+d %>%
+  filter(high == 1) %>%
+  count(q98_6) %>%
+  filter(str_detect(q98_6, "Often") | str_detect(q98_6, "All")) %>%
+  summarize(n = sum(n)) %>%
+  mutate(prop = n / 232)
+
+# never
+
+d %>% 
+  filter(elem == 1) %>% 
+  count(q98_6) %>% 
+  filter(str_detect(q98_6, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 32)
+
+d %>% 
+  filter(middle == 1) %>% 
+  count(q98_6) %>% 
+  filter(str_detect(q98_6, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 114)
+
+d %>% 
+  filter(high == 1) %>% 
+  count(q98_6) %>% 
+  filter(str_detect(q98_6, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 232)
+```
+
+### Select and use grade-appropriate mathematical and/or statistical techniques to analyze data (for example: determining the best measure of central tendency, examining variation in data, or developing a line of best fit) (9) 
+
+```{r}
+# at least once a week
+d %>%
+  filter(elem == 1) %>%
+  count(q98_7) %>%
+  filter(str_detect(q98_7, "Often") | str_detect(q98_7, "All")) %>%
+  summarize(n = sum(n)) %>%
+  mutate(prop = n / 32)
+
+d %>%
+  filter(middle == 1) %>%
+  count(q98_7) %>%
+  filter(str_detect(q98_7, "Often") | str_detect(q98_7, "All")) %>%
+  summarize(n = sum(n)) %>%
+  mutate(prop = n / 114)
+
+d %>%
+  filter(high == 1) %>%
+  count(q98_7) %>%
+  filter(str_detect(q98_7, "Often") | str_detect(q98_7, "All")) %>%
+  summarize(n = sum(n)) %>%
+  mutate(prop = n / 232)
+
+# never
+
+d %>% 
+  filter(elem == 1) %>% 
+  count(q98_7) %>% 
+  filter(str_detect(q98_7, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 32)
+
+d %>% 
+  filter(middle == 1) %>% 
+  count(q98_7) %>% 
+  filter(str_detect(q98_7, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 114)
+
+d %>% 
+  filter(high == 1) %>% 
+  count(q98_7) %>% 
+  filter(str_detect(q98_7, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 232)
+```
+
+### Use mathematical and/or computational models to generate data to support a scientific claim (10) 
+
+```{r}
+# at least once a week
+d %>%
+  filter(elem == 1) %>%
+  count(q98_8) %>%
+  filter(str_detect(q98_8, "Often") | str_detect(q98_8, "All")) %>%
+  summarize(n = sum(n)) %>%
+  mutate(prop = n / 32)
+
+d %>%
+  filter(middle == 1) %>%
+  count(q98_8) %>%
+  filter(str_detect(q98_8, "Often") | str_detect(q98_8, "All")) %>%
+  summarize(n = sum(n)) %>%
+  mutate(prop = n / 114)
+
+d %>%
+  filter(high == 1) %>%
+  count(q98_8) %>%
+  filter(str_detect(q98_8, "Often") | str_detect(q98_8, "All")) %>%
+  summarize(n = sum(n)) %>%
+  mutate(prop = n / 232)
+
+# never
+
+d %>% 
+  filter(elem == 1) %>% 
+  count(q98_8) %>% 
+  filter(str_detect(q98_8, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 32)
+
+d %>% 
+  filter(middle == 1) %>% 
+  count(q98_8) %>% 
+  filter(str_detect(q98_8, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 114)
+
+d %>% 
+  filter(high == 1) %>% 
+  count(q98_8) %>% 
+  filter(str_detect(q98_8, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 232)
+```
+
+### Use data and reasoning to defend, verbally or in writing, a claim or refute alternative scientific claims about a real-world phenomenon (regardless of who made the claims) (11) 
+
+```{r}
+# at least once a week
+d %>%
+  filter(elem == 1) %>%
+  count(q98_9) %>%
+  filter(str_detect(q98_9, "Often") | str_detect(q98_9, "All")) %>%
+  summarize(n = sum(n)) %>%
+  mutate(prop = n / 32)
+
+d %>%
+  filter(middle == 1) %>%
+  count(q98_9) %>%
+  filter(str_detect(q98_9, "Often") | str_detect(q98_9, "All")) %>%
+  summarize(n = sum(n)) %>%
+  mutate(prop = n / 114)
+
+d %>%
+  filter(high == 1) %>%
+  count(q98_9) %>%
+  filter(str_detect(q98_9, "Often") | str_detect(q98_9, "All")) %>%
+  summarize(n = sum(n)) %>%
+  mutate(prop = n / 232)
+
+# never
+
+d %>% 
+  filter(elem == 1) %>% 
+  count(q98_9) %>% 
+  filter(str_detect(q98_9, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 32)
+
+d %>% 
+  filter(middle == 1) %>% 
+  count(q98_9) %>% 
+  filter(str_detect(q98_9, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 114)
+
+d %>% 
+  filter(high == 1) %>% 
+  count(q98_9) %>% 
+  filter(str_detect(q98_9, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 232)
+```
+
+### Determine which variables from a provided dataset are necessary to answer a scientific question (13)
+
+```{r}
+# at least once a week
+d %>%
+  filter(elem == 1) %>%
+  count(q98_2) %>%
+  filter(str_detect(q98_2, "Often") | str_detect(q98_2, "All")) %>%
+  summarize(n = sum(n)) %>%
+  mutate(prop = n / 32) # 29
+
+d %>%
+  filter(middle == 1) %>%
+  count(q98_2) %>%
+  filter(str_detect(q98_2, "Often") | str_detect(q98_2, "All")) %>%
+  summarize(n = sum(n)) %>%
+  mutate(prop = n / 114) # 39
+
+d %>%
+  filter(high == 1) %>%
+  count(q98_2) %>%
+  filter(str_detect(q98_2, "Often") | str_detect(q98_2, "All")) %>%
+  summarize(n = sum(n)) %>%
+  mutate(prop = n / 232) # 39
+
+# never
+
+d %>% 
+  filter(elem == 1) %>% 
+  count(q98_2) %>% 
+  filter(str_detect(q98_2, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 32) # 8
+
+d %>% 
+  filter(middle == 1) %>% 
+  count(q98_2) %>% 
+  filter(str_detect(q98_2, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 114) # 2
+
+d %>% 
+  filter(high == 1) %>% 
+  count(q98_2) %>% 
+  filter(str_detect(q98_2, "Never")) %>% 
+  summarize(n = sum(n)) %>% 
+  mutate(prop = n / 232) # 3
+```
+
+
+## state
+
+```{r}
+d %>% count(state_work) %>%  # PR, outside US, 2 NA
+  arrange(desc(n))
 ```
