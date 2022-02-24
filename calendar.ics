@@ -1,0 +1,11 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+URL:https://www.eventbrite.com/e/seernet-launch-webinar-tickets-186961746617
+DTSTART:20211022T190000Z
+DTEND:20211022T203000Z
+SUMMARY:SEERNet Launch Webinar
+DESCRIPTION:For details, go here:\nhttps://www.eventbrite.com/e/seernet-launch-webinar-tickets-186961746617\n\nTo access the online event page, go here:\nhttps://www.eventbrite.com/x/seernet-launch-webinar-tickets-186961746617
+LOCATION:
+END:VEVENT
+END:VCALENDAR

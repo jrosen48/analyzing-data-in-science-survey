@@ -15,6 +15,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 ```{r}
 library(tidyverse)
 library(googlesheets4)
+library(readxl)
 
 # d <- read_csv("data/fall-2020-analyzing-data-in-science-survey.csv")
 
@@ -27,6 +28,29 @@ d <- read_sheet("https://docs.google.com/spreadsheets/d/1gLyAAp6N_5g-Uo-eb61O-eW
 qual_q80 <- read_sheet("https://docs.google.com/spreadsheets/d/1gLyAAp6N_5g-Uo-eb61O-eW2apMzzqNdM8fLcBV7V3g/edit#gid=957320146", sheet = 8) %>% janitor::clean_names()
 
 qual_q82 <- read_sheet("https://docs.google.com/spreadsheets/d/1gLyAAp6N_5g-Uo-eb61O-eW2apMzzqNdM8fLcBV7V3g/edit#gid=957320146", sheet = 15) %>% janitor::clean_names()
+```
+
+## agreement
+
+```{r}
+pa_irr_1 <- read_csv("pa-irr-data-sources-os.csv") %>% janitor::clean_names()
+pa_irr_2 <- read_csv("pa-irr-data-sources-jr.csv") %>% janitor::clean_names()
+
+check_agree <- function(pa_irr_1, pa_irr_2, n) {
+  t <- data.frame(col1 = as.vector(pa_irr_1[, n]), col2 = as.vector(pa_irr_2[, n]))
+  names(t) <- c("col1", "col2")
+  t <- t %>% replace_na(list(col1 = 0, col2 = 0))
+  list(irr::agree(t), irr::kappa2(t))
+}
+
+check_agree(pa_irr_1, pa_irr_2, 1)
+check_agree(pa_irr_1, pa_irr_2, 2)
+check_agree(pa_irr_1, pa_irr_2, 3)
+check_agree(pa_irr_1, pa_irr_2, 4)
+check_agree(pa_irr_1, pa_irr_2, 5)
+check_agree(pa_irr_1, pa_irr_2, 6)
+check_agree(pa_irr_1, pa_irr_2, 7)
+check_agree(pa_irr_1, pa_irr_2, 8)
 ```
 
 ## Prepping and exploring grade bands
@@ -168,7 +192,7 @@ to_plot <- overall_q97 %>%
   left_join(midd) %>% 
   left_join(high) %>% 
   select(Barrier = val, n, overall = percent, elem, midd, high) %>% 
-  mutate_all(replace_na, 0)
+  mutate_if(is.integer, replace_na, 0)
 
 to_plot %>% 
   filter(!str_detect(Barrier, "Other")) %>%
@@ -262,7 +286,7 @@ to_plot <- overall_q78 %>%
   left_join(midd) %>% 
   left_join(high) %>% 
   select(Technology = val, n, overall = percent, elem, midd, high) %>% 
-  mutate_all(replace_na, 0)
+  mutate_if(is.integer, replace_na, 0)
 
 to_plot %>% 
   filter(!str_detect(Technology, "Other")) %>%
@@ -780,7 +804,7 @@ d %>%
   mutate(prop = n / 232)
 ```
 
-### Consider how missing data or measurement error can affect data interpretation (7) 
+### Consider how missing data or measurement error can affect data interpretation (7)
 
 ```{r}
 # at least once a week
@@ -829,7 +853,7 @@ d %>%
   mutate(prop = n / 232)
 ```
 
-### Select and use grade-appropriate mathematical and/or statistical techniques to analyze data (for example: determining the best measure of central tendency, examining variation in data, or developing a line of best fit) (9) 
+### Select and use grade-appropriate mathematical and/or statistical techniques to analyze data (for example: determining the best measure of central tendency, examining variation in data, or developing a line of best fit) (9)
 
 ```{r}
 # at least once a week
@@ -878,7 +902,7 @@ d %>%
   mutate(prop = n / 232)
 ```
 
-### Use mathematical and/or computational models to generate data to support a scientific claim (10) 
+### Use mathematical and/or computational models to generate data to support a scientific claim (10)
 
 ```{r}
 # at least once a week
@@ -927,7 +951,7 @@ d %>%
   mutate(prop = n / 232)
 ```
 
-### Use data and reasoning to defend, verbally or in writing, a claim or refute alternative scientific claims about a real-world phenomenon (regardless of who made the claims) (11) 
+### Use data and reasoning to defend, verbally or in writing, a claim or refute alternative scientific claims about a real-world phenomenon (regardless of who made the claims) (11)
 
 ```{r}
 # at least once a week
@@ -1024,7 +1048,6 @@ d %>%
   summarize(n = sum(n)) %>% 
   mutate(prop = n / 232) # 3
 ```
-
 
 ## state
 

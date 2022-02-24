@@ -12,8 +12,4 @@ data_social_media_cleaned_names|stem|f81e9839fc0d520c|dcba9d3fbcbfd5cf|d9a163c4f
 data_social_media_sliced|stem|ef253a34998def85|1269ccc4454ed9fb|f11afb26992323d1|-259393264|_targets/objects/data_social_media_sliced|84c1144a5c5ff20b|ab1169daed17c690|5823|rds|vector|||0.006||
 data_social_media_processed|stem|0445beb659d96c81|07858415d324635c|84963444abc62e6d|-755323580|_targets/objects/data_social_media_processed|72ce7f17db14ca54|75754713cf7b81f0|5840|rds|vector|||0.005||
 write_email_addresses|stem|556ce73f2d0675f6|f4462849e531cbcf|0d8092468d0fd8e3|-504858148|_targets/objects/write_email_addresses|dff2af925052a00a|25d650911613e65b|5943|rds|vector|||1.266||
-data_social_media|stem|5062916c44e086e2|fabfcc3838c5de9f|e3b5f2e6e7a0ca04|-1115469339|_targets/objects/data_social_media|99c63b66ab5d1229|103f77a56f421b09|8151|rds|vector|||1.095|Duplicated column names deduplicated Q97  Q97_1 55|
-data_social_media_cleaned_names|stem|f81e9839fc0d520c|dcba9d3fbcbfd5cf|d9a163c4fc63a83b|-1424838020|_targets/objects/data_social_media_cleaned_names|30470904133420db|d274b5c005d7026a|8492|rds|vector|||0.086||
-data_social_media_sliced|stem|ef253a34998def85|1269ccc4454ed9fb|f11afb26992323d1|-259393264|_targets/objects/data_social_media_sliced|84c1144a5c5ff20b|ab1169daed17c690|5823|rds|vector|||0.006||
-data_social_media_processed|stem|0445beb659d96c81|07858415d324635c|84963444abc62e6d|-755323580|_targets/objects/data_social_media_processed|72ce7f17db14ca54|75754713cf7b81f0|5840|rds|vector|||0.005||
-write_email_addresses|stem|556ce73f2d0675f6|f4462849e531cbcf|0d8092468d0fd8e3|-504858148|_targets/objects/write_email_addresses|dff2af925052a00a|25d650911613e65b|5943|rds|vector|||1.266||
+data_mailing_list|stem|50d34b9d4a506124|fd41f84f933eaa24|e3b5f2e6e7a0ca04|-1723643117|_targets/objects/data_mailing_list|9f07449d147b147b||154562|rds|vector|||1.323||UsersjoshuarosenbergDocumentsanalyzingdatainsciencesurveydataanalyzingdatainsciencemailinglistsresponseoptions
